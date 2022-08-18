@@ -65,9 +65,12 @@ void create_user(struct User * user_info, struct Progress * progress_info, struc
     user_info->date = date_info;
 }
 
+void load_user(char * file_name, struct User * user_info, struct Progress * progress_info, struct Date * date_info){
+    
+}
 
 
-void print_user_info(struct User *user_struct){
+void print_user_info(struct User * user_struct){
     printf("Name of the player: %s\n", user_struct->name);
     printf("Savings currency: %c\n", user_struct->currency);
     printf("Amount of savings: %d\n", user_struct->progress->balance);
@@ -76,7 +79,7 @@ void print_user_info(struct User *user_struct){
 
 }
 
-void save_progress(struct User* user){
+void save_progress(struct User * user){
     FILE *fp;
     char filename[255];
     sprintf(filename, "%s_fin_progress.txt", user->name);
@@ -93,7 +96,6 @@ void save_progress(struct User* user){
 
 
 int main() {
-    //help(); help func
     // initializing pointers
     struct User* st_ptr = NULL;
     struct Progress* pr_ptr = NULL;
@@ -104,6 +106,8 @@ int main() {
     pr_ptr = &pr;
     struct User test_user;
     st_ptr = &test_user;
+    //functions
+    help();
     create_user(st_ptr, pr_ptr, date_ptr);
     print_user_info(st_ptr);
     save_progress(st_ptr);
