@@ -10,20 +10,22 @@
 #define EURO_SIGN 'Є';
 #define RUBBLE_SIGN '₽';
 
-struct User
-{
+struct Progress{
+    int balance;
+    int days;
+};
+
+struct Date{
+    unsigned short day;
+    unsigned short month;
+    unsigned short year;
+};
+
+struct User{
     char name[100];
     char currency;
-    struct Progress
-    {
-        int balance;
-        int days;
-    } progress;
-    struct Date{
-        unsigned short day;
-        unsigned short month;
-        unsigned short year;
-    } date;
+    struct Progress *progress;
+    struct Date *date;
     
 };
 
@@ -39,23 +41,23 @@ void help(void) {
     printf("Good luck on your financial journey!!!\n\n");
 }
 
-void fill_info_ab_user(struct User* user_struct, char user_name[100], char user_curr, int user_balance, int user_days, short user_start_day,
+/*void fill_info_ab_user(struct User* user_struct, char user_name[100], char user_curr, int user_balance, int user_days, short user_start_day,
 short user_start_month, short user_start_year){
     strcpy(user_struct->name, user_name);
     user_struct->currency = user_curr;
-    user_struct->progress.balance = user_balance;
-    user_struct->progress.days = user_days;
-    user_struct->date.day = user_start_day;
-    user_struct->date.month = user_start_month;
-    user_struct->date.year = user_start_year;
-}
+    user_struct->progress->balance = user_balance;
+    user_struct->progress->days = user_days;
+    user_struct->date->day = user_start_day;
+    user_struct->date->month = user_start_month;
+    user_struct->date->year = user_start_year;
+}*/
 
 void print_user_info(struct User *user_struct){
     printf("Name of the player: %s\n", user_struct->name);
     printf("Savings currency: %c\n", user_struct->currency);
-    printf("Amount of savings: %d\n", user_struct->progress.balance);
-    printf("The date of the beginning of the game: %hu/%hu/%hu\n", user_struct->date.day, user_struct->date.month, user_struct->date.year);
-    printf("The progress of the journey: %d out of 365 days\n\n", user_struct->progress.days);
+    printf("Amount of savings: %d\n", user_struct->progress->balance);
+    printf("The date of the beginning of the game: %hu/%hu/%hu\n", user_struct->date->day, user_struct->date->month, user_struct->date->year);
+    printf("The progress of the journey: %d out of 365 days\n\n", user_struct->progress->days);
 
 }
 
@@ -66,9 +68,9 @@ void save_progress(struct User* user){
     fp = fopen(filename, "w+");
     fprintf(fp, "Name: %s\n", user->name);
     fprintf(fp, "Saving currency: %c\n", user->currency);
-    fprintf(fp, "Current balance: %d\n", user->progress.balance);
-    fprintf(fp, "Progress: %d out of 365 days\n", user->progress.days);
-    fprintf(fp, "Starting date: %hu/%hu/%hu", user->date.day, user->date.month, user->date.year);
+    fprintf(fp, "Current balance: %d\n", user->progress->balance);
+    fprintf(fp, "Progress: %d out of 365 days\n", user->progress->days);
+    fprintf(fp, "Starting date: %hu/%hu/%hu", user->date->day, user->date->month, user->date->year);
     fclose(fp);
     printf("File was created and saved!\n");
 }
@@ -77,19 +79,37 @@ void save_progress(struct User* user){
 
 int main() {
     //help(); help func
+    // initializing pointers
     struct User* st_ptr = NULL;
+    struct Progress* pr_ptr = NULL;
+    struct Date* date_ptr = NULL;
     time_t t = time(NULL);
+    // filling date info
     struct tm time_data = *localtime(&t);
     short curr_day = time_data.tm_mday;
     short curr_month = 1+time_data.tm_mon;
     short curr_year = 1900+time_data.tm_year;
+    struct Date dat;
+    date_ptr = &dat;
+    date_ptr->day = curr_day;
+    date_ptr->month = curr_month;
+    date_ptr->year = curr_year;
+    // filling progress info
+    struct Progress pr;
+    int balance = 0;
+    int days = 0;
+    pr_ptr = &pr;
+    pr_ptr->balance = balance;
+    pr_ptr->days = days;
+    // filling user info
     struct User test_user;
     st_ptr = &test_user;
     char name[100] = "Jake";
     char currency = DOLLAR_SIGN;
-    int balance = 0;
-    int days = 0;
-    fill_info_ab_user(st_ptr, name, currency, balance, days, curr_day, curr_month, curr_year);
+    strcpy(st_ptr->name, name);
+    st_ptr->currency = currency;
+    st_ptr->progress = pr_ptr;
+    st_ptr->date = date_ptr;
     print_user_info(st_ptr);
     save_progress(st_ptr);
     return 0;
