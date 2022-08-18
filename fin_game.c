@@ -41,16 +41,31 @@ void help(void) {
     printf("Good luck on your financial journey!!!\n\n");
 }
 
-/*void fill_info_ab_user(struct User* user_struct, char user_name[100], char user_curr, int user_balance, int user_days, short user_start_day,
-short user_start_month, short user_start_year){
-    strcpy(user_struct->name, user_name);
-    user_struct->currency = user_curr;
-    user_struct->progress->balance = user_balance;
-    user_struct->progress->days = user_days;
-    user_struct->date->day = user_start_day;
-    user_struct->date->month = user_start_month;
-    user_struct->date->year = user_start_year;
-}*/
+void create_user(struct User * user_info, struct Progress * progress_info, struct Date * date_info){
+    // filling date info
+    time_t t = time(NULL);
+    struct tm time_data = *localtime(&t);
+    short curr_day = time_data.tm_mday;
+    short curr_month = 1+time_data.tm_mon;
+    short curr_year = 1900+time_data.tm_year;
+    date_info->day = curr_day;
+    date_info->month = curr_month;
+    date_info->year = curr_year;
+    // filling progress info
+    int balance = 0;
+    int days = 0;
+    progress_info->balance = balance;
+    progress_info->days = days;
+    // filling user info
+    char name[100] = "Jake";
+    char currency = DOLLAR_SIGN;
+    strcpy(user_info->name, name);
+    user_info->currency = currency;
+    user_info->progress = progress_info;
+    user_info->date = date_info;
+}
+
+
 
 void print_user_info(struct User *user_struct){
     printf("Name of the player: %s\n", user_struct->name);
@@ -83,33 +98,13 @@ int main() {
     struct User* st_ptr = NULL;
     struct Progress* pr_ptr = NULL;
     struct Date* date_ptr = NULL;
-    time_t t = time(NULL);
-    // filling date info
-    struct tm time_data = *localtime(&t);
-    short curr_day = time_data.tm_mday;
-    short curr_month = 1+time_data.tm_mon;
-    short curr_year = 1900+time_data.tm_year;
     struct Date dat;
     date_ptr = &dat;
-    date_ptr->day = curr_day;
-    date_ptr->month = curr_month;
-    date_ptr->year = curr_year;
-    // filling progress info
     struct Progress pr;
-    int balance = 0;
-    int days = 0;
     pr_ptr = &pr;
-    pr_ptr->balance = balance;
-    pr_ptr->days = days;
-    // filling user info
     struct User test_user;
     st_ptr = &test_user;
-    char name[100] = "Jake";
-    char currency = DOLLAR_SIGN;
-    strcpy(st_ptr->name, name);
-    st_ptr->currency = currency;
-    st_ptr->progress = pr_ptr;
-    st_ptr->date = date_ptr;
+    create_user(st_ptr, pr_ptr, date_ptr);
     print_user_info(st_ptr);
     save_progress(st_ptr);
     return 0;
