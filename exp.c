@@ -18,5 +18,8 @@ int main() {
     printf("The sixth symbol: %c\n", *(str_point+5));
     printf("The seventh symbol: %c\n", *(str_point+6));
     printf("The whole string: %s\n", str_point);
+    char num_str[]="234";
+    int num_int = atoi(num_str);
+    printf("String num: %s\nInteger: %d\n", num_str, num_int);
     return 0;
 }

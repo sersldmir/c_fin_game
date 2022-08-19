@@ -1,5 +1,0 @@
-Name: Jake
-Saving currency: $
-Current balance: 0
-Progress: 0 out of 365 days
-Starting date: 18/8/2022
