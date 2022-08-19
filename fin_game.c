@@ -135,19 +135,19 @@ void load_user(char * file_name, struct User * user_info, struct Progress * prog
             }
         }
         else if (strcmp(head_token, "Current balance")==0){
-            progress_info->balance = atoi(value_token);
+            user_info->progress->balance = atoi(value_token);
         }
         else if (strcmp(head_token, "Progress (out of 365 days)")==0){
-            progress_info->days = atoi(value_token);
+            user_info->progress->days = atoi(value_token);
         }
         else if (strcmp(head_token, "Starting day")==0){
-            date_info->day = atoi(value_token);
+            user_info->date->day = atoi(value_token);
         }
         else if (strcmp(head_token, "Starting month")==0){
-            date_info->month = atoi(value_token);
+            user_info->date->month = atoi(value_token);
         }
         else if (strcmp(head_token, "Starting year")==0){
-            date_info->year = atoi(value_token);
+            user_info->date->year = atoi(value_token);
         }
         else{
             printf("Loading went wrong!");
