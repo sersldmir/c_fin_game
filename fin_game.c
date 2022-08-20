@@ -229,6 +229,13 @@ void update_user(struct User * user){
 
 }
 
+void win_condition(struct User * user){
+
+}
+
+void the_end(struct User * user){
+    
+}
 
 
 int main() {
@@ -307,13 +314,5 @@ int main() {
             printf("\n");
         }
     }
-    //functions
-    // help();
-    // create_user(st_ptr, pr_ptr, date_ptr);
-    // print_user_info(st_ptr);
-    //load func
-    // char file_n[]="Jake_fin_progress.csv";
-    // load_user(file_n, st_ptr, pr_ptr, date_ptr);
-    // print_user_info(st_ptr);
     return 0;
 }
