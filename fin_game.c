@@ -10,10 +10,6 @@
     #define ON_WINDOWS 1
 #endif
 
-
-
-
-
 #define DOLLAR 80
 #define EURO 90
 #define RUBBLE 1
@@ -29,11 +25,18 @@ struct Date{
     int year;
 };
 
+struct Last_tr{
+    int l_day;
+    int l_month;
+    int l_year;
+};
+
 struct User{
     char name[100];
     char currency[10];
     struct Progress *progress;
     struct Date *date;
+    struct Last_tr *last_tr;
     
 };
 
@@ -58,7 +61,7 @@ void help(void) {
     printf("Good luck on your financial journey!!!\n\n");
 }
 
-void create_user(struct User * user_info, struct Progress * progress_info, struct Date * date_info){
+void create_user(struct User * user_info, struct Progress * progress_info, struct Date * date_info, struct Last_tr * l_tr_info){
     // filling date info
     const char dol[] = "dollar";
     const char eur[] = "euro";
@@ -77,14 +80,43 @@ void create_user(struct User * user_info, struct Progress * progress_info, struc
     progress_info->balance = balance;
     progress_info->days = days;
     // filling user info
-    char name[100] = "Jake";
+    char name[100];
+    printf("What's your name?\n");
+    scanf("%s", name);
+    printf("\n");
     strcpy(user_info->name, name);
-    strcpy(user_info->currency, dol);
+    char cur[10];
+    while (1){
+        printf("In what currency are you going to save?\n");
+        printf("Supported: dollar, euro, rubble\n");
+        scanf("%s", cur);
+        printf("\n");
+        if ((strcmp(cur, dol)==0) || (strcmp(cur, eur)==0)|| (strcmp(cur, rub)==0)){
+            break;
+        }
+        else{
+            printf("Not supported!\n");
+        }
+    }
+    if (strcmp(cur, dol)==0) {
+        strcpy(user_info->currency, dol);
+    }
+    else if(strcmp(cur, eur)==0){
+        strcpy(user_info->currency, eur);
+    }
+    else if(strcmp(cur, rub)==0){
+        strcpy(user_info->currency, rub);
+    }
+    l_tr_info->l_day = 0;
+    l_tr_info->l_month = 0;
+    l_tr_info->l_year = 0;
     user_info->progress = progress_info;
     user_info->date = date_info;
+    user_info->last_tr = l_tr_info;
+    printf("New user has been created!\n");
 }
 
-void load_user(char * file_name, struct User * user_info, struct Progress * progress_info, struct Date * date_info){
+void load_user(char * file_name, struct User * user_info, struct Progress * progress_info, struct Date * date_info, struct Last_tr * l_tr_info){
     // initializing
     const char dol[] = "dollar";
     const char eur[] = "euro";
@@ -93,7 +125,7 @@ void load_user(char * file_name, struct User * user_info, struct Progress * prog
     file_with_save = fopen(file_name, "r");
     if (file_with_save==NULL){
         printf("NOT FOUND!");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     char contents[2][255];
     int i = 0;
@@ -120,6 +152,7 @@ void load_user(char * file_name, struct User * user_info, struct Progress * prog
     the_rest_values = values;
     user_info->progress = progress_info;
     user_info->date = date_info;
+    user_info->last_tr = l_tr_info;
     while ((head_token = strtok_r(the_rest_headers, ";", &the_rest_headers)) && (value_token = strtok_r(the_rest_values, ";", &the_rest_values))){
         printf("Header: %s\nValue: %s\n", head_token, value_token);
         if (strcmp(head_token,"Name")==0){
@@ -131,7 +164,7 @@ void load_user(char * file_name, struct User * user_info, struct Progress * prog
             }
             else{
                 printf("Loading went wrong!");
-                exit(1);
+                exit(EXIT_FAILURE);
             }
         }
         else if (strcmp(head_token, "Current balance")==0){
@@ -149,22 +182,34 @@ void load_user(char * file_name, struct User * user_info, struct Progress * prog
         else if (strcmp(head_token, "Starting year")==0){
             user_info->date->year = atoi(value_token);
         }
+        else if (strcmp(head_token, "Last transaction day")==0){
+            user_info->last_tr->l_day = atoi(value_token);
+        }
+        else if (strcmp(head_token, "Last transaction month")==0){
+            user_info->last_tr->l_month = atoi(value_token);
+        }
+        else if (strcmp(head_token, "Last transaction year")==0){
+            user_info->last_tr->l_year = atoi(value_token);
+        }
         else{
             printf("Loading went wrong!");
-            exit(1);
+            exit(EXIT_FAILURE);
         }
         c_sleep();
         printf("\n");
     }
     printf("Loading successful!!! Welcome back!\n");
+    printf("\n");
 }
 
 
 void print_user_info(struct User * user_struct){
+    printf("The info:\n");
     printf("Name of the player: %s\n", user_struct->name);
     printf("Savings currency: %s\n", user_struct->currency);
     printf("Amount of savings: %d\n", user_struct->progress->balance);
     printf("The date of the beginning of the game: %d/%d/%d\n", user_struct->date->day, user_struct->date->month, user_struct->date->year);
+    printf("The date of the last transaction: %d/%d/%d\n", user_struct->last_tr->l_day, user_struct->last_tr->l_month, user_struct->last_tr->l_year);
     printf("The progress of the journey: %d out of 365 days\n\n", user_struct->progress->days);
 
 }
@@ -174,8 +219,8 @@ void save_progress(struct User * user){
     char filename[255];
     sprintf(filename, "%s_fin_progress.csv", user->name);
     fp = fopen(filename, "w+");
-    fprintf(fp, "Name;Saving currency;Current balance;Progress (out of 365 days);Starting day;Starting month;Starting year;\n");
-    fprintf(fp, "%s;%s;%d;%d;%hu;%hu;%hu", user->name, user->currency, user->progress->balance, user->progress->days, user->date->day, user->date->month, user->date->year);
+    fprintf(fp, "Name;Saving currency;Current balance;Progress (out of 365 days);Starting day;Starting month;Starting year;Last transaction day;Last transaction month;Last transaction year;\n");
+    fprintf(fp, "%s;%s;%d;%d;%d;%d;%d;%d;%d;%d", user->name, user->currency, user->progress->balance, user->progress->days, user->date->day, user->date->month, user->date->year, user->last_tr->l_day, user->last_tr->l_month, user->last_tr->l_year);
     fclose(fp);
     printf("File was created and saved!\n");
 }
@@ -187,21 +232,50 @@ int main() {
     struct User* st_ptr = NULL;
     struct Progress* pr_ptr = NULL;
     struct Date* date_ptr = NULL;
+    struct Last_tr* l_tr_ptr = NULL; 
     struct Date dat;
     date_ptr = &dat;
     struct Progress pr;
     pr_ptr = &pr;
     struct User test_user;
     st_ptr = &test_user;
+    struct Last_tr l_tr;
+    l_tr_ptr = &l_tr;
+    // infinite loop with the game
+    while (1) {
+        help();
+        printf("Would you like to load the saved progress or create a new user?\n");
+        char answer[255];
+        while (1) {
+            printf("Type 'create' or 'load'\n");
+            scanf("%s", answer);
+            if ((strcmp(answer, "create")==0) || (strcmp(answer, "load")==0)){
+                break;
+            }
+            else{
+                printf("Wrong answer!\n");
+            }
+        }
+        if (strcmp(answer, "create")==0) {
+            create_user(st_ptr, pr_ptr, date_ptr, l_tr_ptr);
+            save_progress(st_ptr);
+        }
+        if (strcmp(answer, "load")==0) {
+            char file_name[255];
+            printf("Insert the full name of the file\n");
+            scanf("%s", file_name);
+            load_user(file_name, st_ptr, pr_ptr, date_ptr, l_tr_ptr);
+        }
+        print_user_info(st_ptr);
+        break;
+    }
     //functions
     // help();
     // create_user(st_ptr, pr_ptr, date_ptr);
     // print_user_info(st_ptr);
-    // save_progress(st_ptr);
     //load func
-    char file_n[]="Jake_fin_progress.csv";
-    char *f_ptr = file_n;
-    load_user(file_n, st_ptr, pr_ptr, date_ptr);
-    print_user_info(st_ptr);
+    // char file_n[]="Jake_fin_progress.csv";
+    // load_user(file_n, st_ptr, pr_ptr, date_ptr);
+    // print_user_info(st_ptr);
     return 0;
 }
