@@ -222,7 +222,11 @@ void save_progress(struct User * user){
     fprintf(fp, "Name;Saving currency;Current balance;Progress (out of 365 days);Starting day;Starting month;Starting year;Last transaction day;Last transaction month;Last transaction year;\n");
     fprintf(fp, "%s;%s;%d;%d;%d;%d;%d;%d;%d;%d", user->name, user->currency, user->progress->balance, user->progress->days, user->date->day, user->date->month, user->date->year, user->last_tr->l_day, user->last_tr->l_month, user->last_tr->l_year);
     fclose(fp);
-    printf("File was created and saved!\n");
+    printf("Progress saved!\n");
+}
+
+void update_user(struct User * user){
+
 }
 
 
@@ -241,33 +245,67 @@ int main() {
     st_ptr = &test_user;
     struct Last_tr l_tr;
     l_tr_ptr = &l_tr;
-    // infinite loop with the game
+    //the game itself
     while (1) {
-        help();
         printf("Would you like to load the saved progress or create a new user?\n");
         char answer[255];
-        while (1) {
-            printf("Type 'create' or 'load'\n");
-            scanf("%s", answer);
-            if ((strcmp(answer, "create")==0) || (strcmp(answer, "load")==0)){
+        printf("Type 'create' or 'load'\n");
+        scanf("%s", answer);
+        if ((strcmp(answer, "create")==0) || (strcmp(answer, "load")==0)){
+            if (strcmp(answer, "create")==0) {
+                create_user(st_ptr, pr_ptr, date_ptr, l_tr_ptr);
+                break;
+                }   
+            if (strcmp(answer, "load")==0) {
+                char file_name[255];
+                printf("Insert the full name of the file\n");
+                scanf("%s", file_name);
+                load_user(file_name, st_ptr, pr_ptr, date_ptr, l_tr_ptr);
+                break;
+                }
+        }
+        else{
+            printf("Wrong answer!\n");
+        }
+    }
+    while (1) {
+        printf("Now that youn are loaded in, you have 2 options:\n");
+        printf("1) Update your progress\n");
+        printf("2) Save and exit\n");
+        printf("3) Help\n");
+        printf("4) Print info\n");
+        char ans_num[3];
+        while(1){
+            printf("Insert the number of option below\n");
+            scanf("%s", ans_num);
+            if (strcmp(ans_num, "1")==0 || strcmp(ans_num, "2")==0 || strcmp(ans_num, "3")==0 || strcmp(ans_num, "4")==0){
+                printf("\n");
                 break;
             }
             else{
-                printf("Wrong answer!\n");
+                printf("Wrong choice!!");
             }
         }
-        if (strcmp(answer, "create")==0) {
-            create_user(st_ptr, pr_ptr, date_ptr, l_tr_ptr);
+        if (strcmp(ans_num, "1")==0){
+            update_user(st_ptr);
+            c_sleep();
+            printf("\n");
+        }
+        if (strcmp(ans_num, "2")==0){
             save_progress(st_ptr);
+            c_sleep();
+            break;
         }
-        if (strcmp(answer, "load")==0) {
-            char file_name[255];
-            printf("Insert the full name of the file\n");
-            scanf("%s", file_name);
-            load_user(file_name, st_ptr, pr_ptr, date_ptr, l_tr_ptr);
+        if (strcmp(ans_num, "3")==0){
+            help();
+            c_sleep();
+            printf("\n");
         }
-        print_user_info(st_ptr);
-        break;
+        if (strcmp(ans_num, "4")==0){
+            print_user_info(st_ptr);
+            c_sleep();
+            printf("\n");
+        }
     }
     //functions
     // help();
